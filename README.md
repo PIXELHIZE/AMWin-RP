@@ -74,6 +74,8 @@ Before posting, please double-check the following:
 
 Push a tag in the form `fork-vMAJOR.MINOR.PATCH` to the PIXELHIZE fork. GitHub Actions builds the x64 and ARM64 packages and creates a draft release containing both update feeds. Review the assets and publish the draft to make the release available to the apps.
 
+To package an existing tag, run **Build Velopack release** from the Actions tab and enter the tag.
+
 To build the x64 packages locally, run the following in PowerShell from the repository root.
 
 ```powershell

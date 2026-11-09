@@ -73,6 +73,8 @@ Last.FM 비밀번호는 로컬 Windows 계정의 [Windows 자격 증명 관리�
 
 PIXELHIZE 포크에 `fork-vMAJOR.MINOR.PATCH` 형식의 태그를 푸시하면 GitHub Actions가 x64와 ARM64 패키지를 빌드하고 두 업데이트 피드를 포함한 릴리스 초안을 만듭니다. 첨부 파일을 검토한 뒤 초안을 게시하면 앱이 업데이트를 받을 수 있습니다.
 
+이미 존재하는 태그를 빌드하려면 Actions 탭에서 **Build Velopack release**를 실행하고 태그를 입력하세요.
+
 x64 패키지를 로컬에서 빌드하려면 저장소 루트에서 다음 PowerShell 명령을 실행하세요.
 
 ```powershell
