@@ -11,7 +11,19 @@ Last.FM 및 ListenBrainz 스크로블링도 지원합니다.
 ## 설치
 AMWin-RP는 Windows 11 24H2 이상이 필요합니다.
 
-빌드는 [여기](https://github.com/PKBeam/AMWin-RP/releases)에서 확인할 수 있습니다.
+### PIXELHIZE 포크 자동 업데이트
+
+x64 PC는 `PIXELHIZE.AMWin-RP-win-x64-Portable.zip`, ARM64 PC는 `PIXELHIZE.AMWin-RP-win-arm64-Portable.zip`을 받으세요. 쓰기 권한이 있는 폴더에 ZIP 전체를 풀고 그 폴더의 `AMWin-RichPresence.exe`를 실행하세요. [PIXELHIZE 포크 릴리스](https://github.com/PIXELHIZE/AMWin-RP/releases)
+
+포크 배포판은 실행 시 백그라운드에서 업데이트를 내려받고 다음 실행 때 적용합니다. 설정의 **업데이트를 자동으로 다운로드하고 다음 실행 시 적용** 옵션은 기본적으로 켜져 있습니다. 옵션을 끄면 이미 내려받은 업데이트도 적용되지 않습니다. 패키징하지 않은 빌드는 업스트림의 업데이트 알림을 사용합니다.
+
+기존 ZIP에서 옮기는 경우, 이전 앱에서 Windows 시작 프로그램 옵션을 끄고 트레이에서 종료한 뒤 새 앱을 여세요.
+
+설정을 옮기려면 새 앱을 한 번 실행한 뒤 두 앱을 모두 종료하고, 이전 설치의 `user.config`를 새 설치의 `user.config`에 덮어쓰세요. 두 파일은 `%LOCALAPPDATA%\AMWin-RichPresence` 아래 서로 다른 하위 폴더에 있습니다. 어느 파일이 해당 앱의 설정인지 모르겠다면, 그 앱만 실행하고 설정을 하나 바꿔 어떤 파일이 생성되거나 수정되는지 확인하세요. 새 앱의 설정 창에서 다시 설정해도 됩니다. 전환을 마친 뒤 로그인할 때 새 앱을 실행하려면 새 앱에서 시작 프로그램 옵션을 켜세요.
+
+### 업스트림 ZIP 빌드
+
+표준 버전과 `NoRuntime` 버전은 [업스트림 릴리스](https://github.com/PKBeam/AMWin-RP/releases)에서 받을 수 있습니다.
 
 ### 어떤 릴리스를 사용해야 하나요?
 PC 프로세서에 맞게 x64 또는 ARM64를 선택하세요.  
@@ -56,3 +68,13 @@ Last.FM 비밀번호는 로컬 Windows 계정의 [Windows 자격 증명 관리�
 등록 전 아래 항목을 확인해 주세요:
 - 문제가 이미 열린/닫힌 이슈에 포함되어 있지 않은지
 - Discord에서 RP 표시가 활성화되어 있는지 (Settings > Activity Settings > Activity Privacy > Activity Status)
+
+## 포크 릴리스 배포
+
+PIXELHIZE 포크에 `fork-vMAJOR.MINOR.PATCH` 형식의 태그를 푸시하면 GitHub Actions가 x64와 ARM64 패키지를 빌드하고 두 업데이트 피드를 포함한 릴리스 초안을 만듭니다. 첨부 파일을 검토한 뒤 초안을 게시하면 앱이 업데이트를 받을 수 있습니다.
+
+x64 패키지를 로컬에서 빌드하려면 저장소 루트에서 다음 PowerShell 명령을 실행하세요.
+
+```powershell
+.\BuildVelopackRelease.ps1 -Version 1.6.3 -Architecture x64
+```

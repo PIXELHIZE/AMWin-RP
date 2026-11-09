@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Settings_General_AutomaticUpdates" xml:space="preserve">
+    <value>更新を自動でダウンロードし、次回起動時に適用する</value>
+  </data>
   <data name="Settings_General_UpdateOnStartup" xml:space="preserve">
     <value>起動時にアップデートを確認</value>
   </data>

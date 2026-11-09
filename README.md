@@ -11,7 +11,19 @@ Also includes scrobbling for Last.FM and ListenBrainz.
 ## Installation
 AMWin-RP requires Windows 11 24H2 or later.
 
-Builds can be found [here](https://github.com/PKBeam/AMWin-RP/releases).  
+### Automatic updates in the PIXELHIZE fork
+
+Download `PIXELHIZE.AMWin-RP-win-x64-Portable.zip` for x64 PCs or `PIXELHIZE.AMWin-RP-win-arm64-Portable.zip` for ARM64 PCs. Extract the entire ZIP to a writable folder and launch `AMWin-RichPresence.exe` from that folder. [PIXELHIZE fork releases](https://github.com/PIXELHIZE/AMWin-RP/releases)
+
+The packaged fork downloads updates in the background when it starts and applies them on the next launch. **Download updates automatically and apply them on the next launch** is enabled by default in settings. Turning it off also prevents already downloaded updates from being applied. Unpackaged builds keep the upstream update notification.
+
+When switching from an older ZIP, turn off its Windows startup option and exit it from the tray before opening the new app.
+
+To transfer settings, run the new app once, exit both copies, and copy the old installation's `user.config` over the new installation's `user.config`. Both files are in separate subfolders under `%LOCALAPPDATA%\AMWin-RichPresence`. If you're unsure which file belongs to a copy, run that copy on its own and change a setting to see which file it creates or modifies. You can also set up the new copy in its settings window. After switching, enable the new app's Windows startup option if you want it to launch at sign-in.
+
+### Upstream ZIP builds
+
+Standard and `NoRuntime` builds are available from the [upstream releases](https://github.com/PKBeam/AMWin-RP/releases).
 
 ### Which release do I use?
 Pick x64 or ARM64 based on what processor your PC has. (If you have an Intel or AMD CPU, pick the x64 release.)  
@@ -57,3 +69,13 @@ If you are reporting a problem, please attach any relevant `.log` files (found i
 Before posting, please double-check the following:
 - The problem isn't already covered by an existing open or closed issue.
 - You have RP display enabled in Discord (Settings > Activity Settings > Activity Privacy > Activity Status).
+
+## Publishing a fork release
+
+Push a tag in the form `fork-vMAJOR.MINOR.PATCH` to the PIXELHIZE fork. GitHub Actions builds the x64 and ARM64 packages and creates a draft release containing both update feeds. Review the assets and publish the draft to make the release available to the apps.
+
+To build the x64 packages locally, run the following in PowerShell from the repository root.
+
+```powershell
+.\BuildVelopackRelease.ps1 -Version 1.6.3 -Architecture x64
+```

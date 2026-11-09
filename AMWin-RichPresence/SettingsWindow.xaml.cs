@@ -30,6 +30,11 @@ namespace AMWin_RichPresence {
             ApplicationThemeManager.ApplySystemTheme();
             SystemThemeWatcher.Watch(this);
             InitializeComponent();
+            if (Program.UsesForkUpdates) {
+                CheckBox_CheckForUpdatesOnStartup.Content = GetLocalisedString(
+                    "Settings_General_AutomaticUpdates",
+                    "Download updates automatically and apply them on the next launch");
+            }
             InitializeLanguageSelector();
             InitializeDiscordClientSelector();
 

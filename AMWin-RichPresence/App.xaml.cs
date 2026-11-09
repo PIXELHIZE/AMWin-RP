@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Velopack;
+using Velopack.Sources;
 using Localisation = AMWin_RichPresence.Properties.Localisation;
 using MessageBox = Wpf.Ui.Controls.MessageBox;
 using MessageBoxResult = Wpf.Ui.Controls.MessageBoxResult;
@@ -107,11 +109,6 @@ namespace AMWin_RichPresence {
             }
             logger?.Log($"Using region {AMWin_RichPresence.Properties.Settings.Default.AppleMusicRegion}");
 
-            // check for updates
-            if (AMWin_RichPresence.Properties.Settings.Default.CheckForUpdatesOnStartup) {
-                _ = CheckForUpdates();
-            }
-
             // start Discord RPC
             var statusDisplayOptions = (AppleMusicDiscordClient.RPStatusDisplayOptions)AMWin_RichPresence.Properties.Settings.Default.RPDisplayChoice;
             var classicalComposerAsArtist = AMWin_RichPresence.Properties.Settings.Default.ClassicalComposerAsArtist;
@@ -167,6 +164,9 @@ namespace AMWin_RichPresence {
         protected override void OnStartup(StartupEventArgs e) {
             base.OnStartup(e);
             taskbarIcon = (TaskbarIcon)FindResource("TaskbarIcon");
+            if (AMWin_RichPresence.Properties.Settings.Default.CheckForUpdatesOnStartup) {
+                _ = CheckForUpdates(e.Args);
+            }
             if (e.Args.Contains(OpenSettingsWindowArg, StringComparer.OrdinalIgnoreCase)) {
                 Current.Dispatcher.BeginInvoke(new Action(() => {
                     var settingsWindow = new SettingsWindow();
@@ -208,8 +208,29 @@ namespace AMWin_RichPresence {
             amScraper.composerAsArtist = composerAsArtist;
         }
 
-        internal async Task CheckForUpdates() {
+        private async Task CheckForUpdates(string[] restartArgs) {
             try {
+                if (Program.UsesForkUpdates) {
+                    var source = new GithubSource(Program.ForkRepositoryUrl, accessToken: null, prerelease: false);
+                    var updates = new UpdateManager(source);
+
+                    if (!Program.RestartedForUpdate && updates.UpdatePendingRestart is { } pending) {
+                        logger?.Log($"Applying AMWin-RP update {pending.Version}.");
+                        updates.WaitExitThenApplyUpdates(pending, silent: true, restartArgs: restartArgs);
+                        Shutdown();
+                        return;
+                    }
+
+                    var update = await updates.CheckForUpdatesAsync();
+                    if (update != null) {
+                        await updates.DownloadUpdatesAsync(update);
+                        logger?.Log($"Downloaded AMWin-RP update {update.TargetFullRelease.Version} for the next launch.");
+                    } else {
+                        logger?.Log("No AMWin-RP updates available.");
+                    }
+                    return;
+                }
+
                 static int StringVerToInt(string v) {
                     var verStr = v[1..].Split("b")[0].Replace(".", "").PadRight(4, '0');
                     return int.Parse(verStr);

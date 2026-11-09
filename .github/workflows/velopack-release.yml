@@ -1,0 +1,62 @@
+name: Build Velopack release
+
+on:
+  push:
+    tags:
+      - 'fork-v[0-9]+.[0-9]+.[0-9]+'
+
+concurrency:
+  group: velopack-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    if: github.repository == 'PIXELHIZE/AMWin-RP'
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: '10.0.x'
+      - name: Package x64 and ARM64
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME.Substring('fork-v'.Length)
+          ./BuildVelopackRelease.ps1 -Version $version -Architecture x64
+          ./BuildVelopackRelease.ps1 -Version $version -Architecture arm64
+      - name: Create release draft with both update feeds
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $version = $tag.Substring('fork-v'.Length)
+          $releaseTags = gh api --paginate "repos/$env:GITHUB_REPOSITORY/releases?per_page=100" --jq '.[].tag_name'
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Could not check for an existing release or draft'
+          }
+          if ($releaseTags -ccontains $tag) {
+            throw "A release or draft already exists for $tag. If an upload left an incomplete draft, remove that draft before rerunning."
+          }
+
+          $assets = foreach ($channel in 'win-x64', 'win-arm64') {
+            $directory = "artifacts/velopack/$version/$channel/release"
+            $names = @(
+              "releases.$channel.json"
+              "PIXELHIZE.AMWin-RP-$version-$channel-full.nupkg"
+              "PIXELHIZE.AMWin-RP-$channel-Portable.zip"
+              "PIXELHIZE.AMWin-RP-$channel-Setup.exe"
+            )
+            foreach ($name in $names) {
+              (Resolve-Path -LiteralPath (Join-Path $directory $name)).Path
+            }
+          }
+
+          gh release create $tag @assets --verify-tag --draft --title "AMWin-RP $version" --generate-notes
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release draft creation failed for $tag"
+          }
